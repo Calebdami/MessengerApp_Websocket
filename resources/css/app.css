@@ -1,0 +1,173 @@
+@import "tailwindcss";
+@import "primeicons/primeicons.css";
+
+/* ─── Thème dark (défaut) ─────────────────────────────────────── */
+:root {
+    --bg-primary:     #0f0f10;
+    --bg-secondary:   #1a1a1d;
+    --bg-tertiary:    #242428;
+    --bg-hover:       #2e2e33;
+    --border:         #2e2e33;
+    --text-primary:   #f1f1f3;
+    --text-secondary: #9b9ba8;
+    --accent:         #6366f1;
+    --accent-hover:   #5558e3;
+    --online:         #22c55e;
+    --offline:        #6b7280;
+    --busy:           #ef4444;
+    --away:           #f59e0b;
+    --bubble-sent-bg: #6366f1;
+    --bubble-recv-bg: #242428;
+}
+
+/* ─── Thème clair ─────────────────────────────────────────────── */
+.light {
+    --bg-primary:     #f0f2f5;
+    --bg-secondary:   #ffffff;
+    --bg-tertiary:    #e4e6ea;
+    --bg-hover:       #d8dadf;
+    --border:         #dddfe2;
+    --text-primary:   #1c1e21;
+    --text-secondary: #65676b;
+    --accent:         #6366f1;
+    --accent-hover:   #5558e3;
+    --bubble-sent-bg: #6366f1;
+    --bubble-recv-bg: #e4e6ea;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ─── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 4px; }
+
+/* ─── Animations ──────────────────────────────────────────────── */
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(100%); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideOutRight {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(100%); }
+}
+@keyframes slideUp   { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn    { from { opacity:0; } to { opacity:1; } }
+@keyframes bounce    { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
+
+.slide-up  { animation: slideUp 0.2s ease; }
+.fade-in   { animation: fadeIn 0.2s ease; }
+
+/* ─── Status dots ─────────────────────────────────────────────── */
+.status-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-secondary);
+    display: inline-block;
+}
+.status-dot.online  { background: var(--online); }
+.status-dot.offline { background: var(--offline); }
+.status-dot.busy    { background: var(--busy); }
+.status-dot.away    { background: var(--away); }
+
+/* ─── Bulles messages ─────────────────────────────────────────── */
+.bubble-sent {
+    background: var(--bubble-sent-bg);
+    color: #fff;
+    border-radius: 18px 18px 4px 18px;
+}
+.bubble-received {
+    background: var(--bubble-recv-bg);
+    color: var(--text-primary);
+    border-radius: 18px 18px 18px 4px;
+}
+
+/* ─── Typing indicator ────────────────────────────────────────── */
+.typing-dot {
+    width: 6px; height: 6px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* ─── Toast notifications (custom Messenger style) ────────────── */
+.messenger-toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.messenger-toast {
+    pointer-events: all;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 16px;
+    min-width: 300px;
+    max-width: 380px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    animation: slideInRight 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer;
+}
+.messenger-toast.leaving {
+    animation: slideOutRight 0.3s ease forwards;
+}
+.messenger-toast.success { background: rgba(34, 197, 94, 0.15); border-color: rgba(34,197,94,0.3); }
+.messenger-toast.error   { background: rgba(239, 68, 68, 0.15);  border-color: rgba(239,68,68,0.3); }
+.messenger-toast.warning { background: rgba(245,158,11,0.15);    border-color: rgba(245,158,11,0.3); }
+.messenger-toast.info    { background: rgba(99, 102, 241, 0.15); border-color: rgba(99,102,241,0.3); }
+.messenger-toast.message { background: var(--bg-secondary);      border-color: var(--border); }
+
+.light .messenger-toast { box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+.light .messenger-toast.message { background: #fff; }
+
+/* ─── Modal de confirmation ────────────────────────────────────── */
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+}
+.confirm-modal {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─── Fond adaptatif ──────────────────────────────────────────── */
+.bg-app-primary   { background: var(--bg-primary); }
+.bg-app-secondary { background: var(--bg-secondary); }
+.bg-app-tertiary  { background: var(--bg-tertiary); }
+.bg-app-hover     { background: var(--bg-hover); }
+.border-app       { border-color: var(--border); }
+.text-app-primary { color: var(--text-primary); }
+.text-app-secondary { color: var(--text-secondary); }
