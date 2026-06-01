@@ -7,6 +7,12 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+// Redirection racine
+Route::get('/', function () {
+    return auth()->check()
+        ? redirect()->route('conversations.index')
+        : redirect()->route('login');
+});
 // Auth
 Route::middleware('guest')->group(function () {
     Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
