@@ -53,7 +53,7 @@
           <!-- Vidéo -->
           <div v-else-if="message.type === 'video'">
             <video :src="message.file_url || message.content"
-              controls class="rounded-xl max-w-xs max-h-64" preload="metadata" />
+              controls class="rounded-xl max-w-xs md:max-w-md max-h-64 w-full" preload="metadata" />
           </div>
 
           <!-- Audio -->
@@ -116,6 +116,7 @@
         <!-- ── Bouton 3 points (visible au hover du groupe) ── -->
         <div v-if="!message.is_deleted" class="relative flex-shrink-0">
           <button
+            ref="menuBtn"
             @click.stop="toggleMenu"
             class="w-7 h-7 rounded-full flex items-center justify-center transition
                    opacity-0 group-hover:opacity-100 hover:!opacity-100
@@ -133,11 +134,8 @@
           <!-- Menu déroulant -->
           <Transition name="menu">
             <div v-if="showMenu"
-              :class="[
-                'absolute z-50 bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl py-1 w-52 overflow-hidden',
-                isMine ? 'right-0' : 'left-0',
-                menuAbove ? 'bottom-9' : 'top-9'
-              ]">
+              class="fixed z-50 bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl py-1 min-w-52 overflow-hidden"
+              :style="menuStyle">
 
               <!-- Réactions rapides -->
               <div class="flex justify-around px-3 py-2.5 border-b border-gray-700">
@@ -266,7 +264,6 @@ const audioEl     = ref(null);
 const isPlaying   = ref(false);
 const audioProgress = ref(0);
 const audioDuration = ref('0:00');
-const menuAbove   = ref(false);
 const menuBtn     = ref(null);
 
 const quickEmojis = ['❤️','😂','😮','😢','😡','👍'];
@@ -281,10 +278,38 @@ const groupedReactions = computed(() => {
     return Object.values(map);
 });
 
+const menuStyle = computed(() => {
+    if (!menuBtn.value || !showMenu.value) return {};
+    const rect = menuBtn.value.getBoundingClientRect();
+    const menuWidth = 208; // w-52 = 13rem = 208px
+    const menuHeight = 300; // hauteur approximative du menu
+    const padding = 10;
+
+    let left = rect.right + padding;
+    let top = rect.top;
+
+    // Ajuster si le menu sort par la droite
+    if (left + menuWidth > window.innerWidth) {
+        left = rect.left - menuWidth - padding;
+    }
+
+    // Ajuster si le menu sort par le bas
+    if (top + menuHeight > window.innerHeight) {
+        top = window.innerHeight - menuHeight - padding;
+    }
+
+    // Ajuster si le menu sort par le haut
+    if (top < padding) {
+        top = padding;
+    }
+
+    return {
+        left: `${left}px`,
+        top: `${top}px`,
+    };
+});
+
 function toggleMenu(e) {
-    // Détecter si le menu doit s'ouvrir vers le haut
-    const rect = e.currentTarget.getBoundingClientRect();
-    menuAbove.value = rect.bottom + 280 > window.innerHeight;
     showMenu.value = !showMenu.value;
 }
 

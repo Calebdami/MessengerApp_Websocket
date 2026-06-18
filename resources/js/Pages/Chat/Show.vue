@@ -197,9 +197,9 @@
 
           <!-- Stickers -->
           <div class="relative flex-shrink-0">
-            <button @click="showStickers = !showStickers"
+            <button @click="showStickers = !showStickers" ref="stickersBtn"
               class="w-10 h-10 flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white text-xl rounded-lg transition">🎭</button>
-            <div v-if="showStickers" class="absolute bottom-12 right-0 z-50 bg-gray-800 rounded-2xl p-3 grid grid-cols-5 gap-2 w-56 shadow-xl">
+            <div v-if="showStickers" class="fixed z-50 bg-gray-800 rounded-2xl p-3 grid grid-cols-5 gap-2 shadow-xl" :style="stickersMenuStyle">
               <button v-for="s in stickers" :key="s" @click="sendSticker(s); showStickers = false"
                 class="text-2xl hover:scale-125 transition">{{ s }}</button>
             </div>
@@ -207,13 +207,13 @@
 
           <!-- More options -->
           <div class="relative flex-shrink-0">
-            <button @click="showMoreOptions = !showMoreOptions"
+            <button @click="showMoreOptions = !showMoreOptions" ref="moreOptionsBtn"
               class="w-10 h-10 flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white text-lg rounded-lg transition">⋮</button>
-            <div v-if="showMoreOptions" class="absolute bottom-12 right-0 z-50 bg-gray-900 rounded-2xl border border-gray-700 shadow-xl overflow-hidden">
+            <div v-if="showMoreOptions" class="fixed z-50 bg-gray-900 rounded-2xl border border-gray-700 shadow-xl overflow-hidden min-w-48" :style="moreOptionsMenuStyle">
               <!-- Emoji -->
               <div class="p-2">
                 <button @click="showEmoji = !showEmoji"
-                  class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition text-left">
+                  class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition text-left whitespace-nowrap">
                   😊 Emoji
                 </button>
                 <div v-if="showEmoji" class="mt-2">
@@ -223,16 +223,16 @@
               <div class="border-t border-gray-700"></div>
               <!-- Attachments -->
               <div class="p-2 space-y-1">
-                <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer">
+                <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer whitespace-nowrap">
                   🖼️ Image <input type="file" accept="image/*" class="hidden" @change="(e) => { sendFile(e, 'image'); showMoreOptions = false; }" />
                 </label>
-                <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer">
+                <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer whitespace-nowrap">
                   🎥 Vidéo <input type="file" accept="video/*" class="hidden" @change="(e) => { sendFile(e, 'video'); showMoreOptions = false; }" />
                 </label>
-                <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer">
+                <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer whitespace-nowrap">
                   🎵 Audio <input type="file" accept="audio/*" class="hidden" @change="(e) => { sendFile(e, 'audio'); showMoreOptions = false; }" />
                 </label>
-                <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer">
+                <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer whitespace-nowrap">
                   📎 Fichier <input type="file" class="hidden" @change="(e) => { sendFile(e, 'file'); showMoreOptions = false; }" />
                 </label>
               </div>
@@ -321,6 +321,8 @@ const { localStream, remoteStream, callStatus, isMuted, isVideoOff, startCall: i
 const messagesEl  = ref(null);
 const bottomEl    = ref(null);
 const textareaEl  = ref(null);
+const moreOptionsBtn = ref(null);
+const stickersBtn = ref(null);
 const newMessage  = ref('');
 const replyTo     = ref(null);
 const showEmoji   = ref(false);
@@ -394,6 +396,58 @@ const groupedMessages = computed(() => {
     groups[date].push(m);
   });
   return Object.entries(groups).map(([date, messages]) => ({ date, messages }));
+});
+
+const moreOptionsMenuStyle = computed(() => {
+  if (!moreOptionsBtn.value || !showMoreOptions.value) return {};
+  const rect = moreOptionsBtn.value.getBoundingClientRect();
+  const menuWidth = 192; // min-w-48 = 12rem = 192px
+  const menuHeight = 250;
+  const padding = 10;
+
+  let left = rect.right + padding;
+  let top = rect.top;
+
+  // Ajuster si le menu sort par la droite
+  if (left + menuWidth > window.innerWidth) {
+    left = rect.left - menuWidth - padding;
+  }
+
+  // Ajuster si le menu sort par le bas
+  if (top + menuHeight > window.innerHeight) {
+    top = window.innerHeight - menuHeight - padding;
+  }
+
+  return {
+    left: `${left}px`,
+    top: `${top}px`,
+  };
+});
+
+const stickersMenuStyle = computed(() => {
+  if (!stickersBtn.value || !showStickers.value) return {};
+  const rect = stickersBtn.value.getBoundingClientRect();
+  const menuWidth = 224; // w-56 = 14rem = 224px
+  const menuHeight = 200;
+  const padding = 10;
+
+  let left = rect.right + padding;
+  let top = rect.top;
+
+  // Ajuster si le menu sort par la droite
+  if (left + menuWidth > window.innerWidth) {
+    left = rect.left - menuWidth - padding;
+  }
+
+  // Ajuster si le menu sort par le bas
+  if (top + menuHeight > window.innerHeight) {
+    top = window.innerHeight - menuHeight - padding;
+  }
+
+  return {
+    left: `${left}px`,
+    top: `${top}px`,
+  };
 });
 
 async function sendMessage() {
