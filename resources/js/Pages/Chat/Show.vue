@@ -1,8 +1,10 @@
 <template>
   <div class="flex h-screen bg-gray-950 overflow-hidden">
+    <!-- Backdrop mobile -->
+    <div v-if="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 bg-black/50 z-40 md:hidden"></div>
 
     <!-- ── Sidebar conversations ──────────────────────────────────── -->
-    <aside class="w-80 flex-shrink-0 bg-gray-900 border-r border-gray-800 flex flex-col">
+    <aside :class="['fixed md:static inset-y-0 left-0 w-80 flex-shrink-0 bg-gray-900 border-r border-gray-800 flex flex-col transition-transform duration-300 z-50 md:z-auto', sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0']">
       <div class="p-4 border-b border-gray-800 flex items-center justify-between">
         <a href="/conversations" class="text-white font-bold text-lg flex items-center gap-2">💬 Messenger</a>
         <button @click="showNewChat = true"
@@ -14,7 +16,7 @@
       </div>
       <div class="flex-1 overflow-y-auto">
         <div v-for="conv in filteredSidebar" :key="conv.id"
-          @click="router.visit(`/conversations/${conv.id}`)"
+          @click="sidebarOpen = false; router.visit(`/conversations/${conv.id}`)"
           :class="['flex items-center gap-3 px-3 py-3 cursor-pointer transition hover:bg-gray-800 border-b border-gray-800/50',
             { 'bg-indigo-900/30 border-l-2 border-l-indigo-500': conv.id === conversation.id }]">
           <img :src="conv.avatar" class="w-11 h-11 rounded-full object-cover flex-shrink-0" />
@@ -37,6 +39,10 @@
 
       <!-- Header conversation -->
       <header class="flex items-center gap-3 px-4 py-3 bg-gray-900 border-b border-gray-800 flex-shrink-0">
+        <!-- Toggle button mobile -->
+        <button @click="sidebarOpen = !sidebarOpen" class="md:hidden w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center text-white transition flex-shrink-0" title="Menu">
+          ☰
+        </button>
         <img :src="conversation.avatar" class="w-10 h-10 rounded-full object-cover" />
         <div class="flex-1">
           <h2 class="font-semibold text-white">{{ conversation.name }}</h2>
@@ -114,7 +120,8 @@
 
       <!-- Input area -->
       <div class="px-4 py-3 bg-gray-900 border-t border-gray-800 flex-shrink-0">
-        <div class="flex items-end gap-3">
+        <!-- Desktop layout -->
+        <div class="hidden md:flex items-end gap-3">
 
           <!-- Emoji -->
           <div class="relative">
@@ -168,6 +175,73 @@
           <!-- Send -->
           <button @click="sendMessage" :disabled="!newMessage.trim() && !sending"
             class="w-10 h-10 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 rounded-full flex items-center justify-center text-white text-lg transition flex-shrink-0">
+            ➤
+          </button>
+        </div>
+
+        <!-- Mobile layout -->
+        <div class="md:hidden flex items-end gap-2">
+          <!-- Textarea responsive -->
+          <div class="flex-1 relative">
+            <textarea
+              ref="textareaEl"
+              v-model="newMessage"
+              @keydown="onKeydown"
+              @input="onInput"
+              rows="1"
+              placeholder="Écrivez…"
+              class="w-full bg-gray-800 border border-gray-700 rounded-2xl px-4 py-2 text-white placeholder-gray-500 resize-none focus:outline-none focus:border-indigo-500 transition"
+              style="max-height: 150px; overflow-y: auto;"
+            ></textarea>
+          </div>
+
+          <!-- Stickers -->
+          <div class="relative flex-shrink-0">
+            <button @click="showStickers = !showStickers"
+              class="w-10 h-10 flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white text-xl rounded-lg transition">🎭</button>
+            <div v-if="showStickers" class="absolute bottom-12 right-0 z-50 bg-gray-800 rounded-2xl p-3 grid grid-cols-5 gap-2 w-56 shadow-xl">
+              <button v-for="s in stickers" :key="s" @click="sendSticker(s); showStickers = false"
+                class="text-2xl hover:scale-125 transition">{{ s }}</button>
+            </div>
+          </div>
+
+          <!-- More options -->
+          <div class="relative flex-shrink-0">
+            <button @click="showMoreOptions = !showMoreOptions"
+              class="w-10 h-10 flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white text-lg rounded-lg transition">⋮</button>
+            <div v-if="showMoreOptions" class="absolute bottom-12 right-0 z-50 bg-gray-900 rounded-2xl border border-gray-700 shadow-xl overflow-hidden">
+              <!-- Emoji -->
+              <div class="p-2">
+                <button @click="showEmoji = !showEmoji"
+                  class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition text-left">
+                  😊 Emoji
+                </button>
+                <div v-if="showEmoji" class="mt-2">
+                  <emoji-picker @emoji-click="onEmojiClick"></emoji-picker>
+                </div>
+              </div>
+              <div class="border-t border-gray-700"></div>
+              <!-- Attachments -->
+              <div class="p-2 space-y-1">
+                <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer">
+                  🖼️ Image <input type="file" accept="image/*" class="hidden" @change="(e) => { sendFile(e, 'image'); showMoreOptions = false; }" />
+                </label>
+                <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer">
+                  🎥 Vidéo <input type="file" accept="video/*" class="hidden" @change="(e) => { sendFile(e, 'video'); showMoreOptions = false; }" />
+                </label>
+                <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer">
+                  🎵 Audio <input type="file" accept="audio/*" class="hidden" @change="(e) => { sendFile(e, 'audio'); showMoreOptions = false; }" />
+                </label>
+                <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer">
+                  📎 Fichier <input type="file" class="hidden" @change="(e) => { sendFile(e, 'file'); showMoreOptions = false; }" />
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Send -->
+          <button @click="sendMessage" :disabled="!newMessage.trim() && !sending"
+            class="w-10 h-10 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 rounded-lg flex items-center justify-center text-white text-lg transition flex-shrink-0">
             ➤
           </button>
         </div>
@@ -253,7 +327,9 @@ const showEmoji   = ref(false);
 const showStickers= ref(false);
 const showInfo    = ref(false);
 const showNewChat = ref(false);
+const showMoreOptions = ref(false);
 const sidebarSearch = ref('');
+const sidebarOpen = ref(false);
 const sending     = ref(false);
 const hasMore     = ref(props.messages?.length === 50);
 const loadingMore = ref(false);

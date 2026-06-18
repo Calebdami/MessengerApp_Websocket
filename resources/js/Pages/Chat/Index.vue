@@ -1,7 +1,10 @@
 <template>
   <div class="flex h-screen bg-gray-950 overflow-hidden">
+    <!-- Backdrop mobile -->
+    <div v-if="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 bg-black/50 z-40 md:hidden"></div>
+
     <!-- Sidebar -->
-    <aside class="w-80 flex-shrink-0 bg-gray-900 border-r border-gray-800 flex flex-col">
+    <aside :class="['fixed md:static inset-y-0 left-0 w-80 flex-shrink-0 bg-gray-900 border-r border-gray-800 flex flex-col transition-transform duration-300 z-50 md:z-auto', sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0']">
       <!-- Header -->
       <div class="p-4 border-b border-gray-800 flex items-center justify-between">
         <h1 class="text-xl font-bold text-white">💬 Messenger</h1>
@@ -99,7 +102,11 @@
     </aside>
 
     <!-- Empty state -->
-    <main class="flex-1 flex items-center justify-center bg-gray-950">
+    <main class="flex-1 flex flex-col items-center justify-center bg-gray-950">
+      <!-- Toggle button mobile -->
+      <button @click="sidebarOpen = !sidebarOpen" class="absolute top-4 left-4 md:hidden w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center text-white transition" title="Menu">
+        ☰
+      </button>
       <div class="text-center text-gray-500">
         <div class="text-8xl mb-4">💬</div>
         <h2 class="text-2xl font-semibold text-gray-400 mb-2">Bienvenue sur Messenger</h2>
@@ -161,6 +168,7 @@ const { subscribePresence, subscribeNotifications } = useRealtime(props.authUser
 const search = ref('');
 const showNewChat = ref(false);
 const showNotifications = ref(false);
+const sidebarOpen = ref(false);
 
 onMounted(() => {
   store.setConversations(props.conversations);
@@ -178,6 +186,7 @@ const filteredConversations = computed(() => {
 
 function openConversation(conv) {
   router.visit(`/conversations/${conv.id}`);
+  sidebarOpen.value = false;
 }
 
 function getStatus(conv) {
