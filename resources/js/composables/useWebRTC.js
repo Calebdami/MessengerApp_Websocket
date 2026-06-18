@@ -116,22 +116,27 @@ export function useWebRTC(authUserId) {
         callStatus.value = 'ended';
     }
 
-    function endCall() {
-        if (currentCallUuid) {
-            axios.post(`/calls/${currentCallUuid}/signal`, {
-                status: 'ended',
-                signal: JSON.stringify({ type: 'ended' }),
-            });
+    async function endCall() {
+        try {
+            if (currentCallUuid) {
+                await axios.post(`/calls/${currentCallUuid}/signal`, {
+                    status: 'ended',
+                    signal: JSON.stringify({ type: 'ended' }),
+                }).catch(() => {}); // Ignorer les erreurs réseau
+            }
+        } catch (err) {
+            console.error('Erreur fermeture appel:', err);
+        } finally {
+            peerConnection?.close();
+            peerConnection = null;
+            localStream.value?.getTracks().forEach(t => t.stop());
+            localStream.value = null;
+            remoteStream.value = null;
+            callStatus.value = 'ended';
+            currentCallUuid = null;
         }
-        peerConnection?.close();
-        peerConnection = null;
-        localStream.value?.getTracks().forEach(t => t.stop());
-        localStream.value = null;
-        remoteStream.value = null;
-        callStatus.value = 'ended';
-        currentCallUuid = null;
     }
-
+   
     function toggleMute() {
         isMuted.value = !isMuted.value;
         localStream.value?.getAudioTracks().forEach(t => { t.enabled = !isMuted.value; });

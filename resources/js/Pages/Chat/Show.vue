@@ -55,9 +55,15 @@
           </p>
         </div>
         <div class="flex items-center gap-2">
-          <button @click="startCall('audio')" class="w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition" title="Appel audio">📞</button>
-          <button @click="startCall('video')" class="w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition" title="Appel vidéo">📹</button>
-          <button @click="showInfo = !showInfo" class="w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition">ℹ️</button>
+          <button @click="startCall('audio')" class="w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition text-gray-300 hover:text-white" title="Appel audio">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </button>
+          <button @click="startCall('video')" class="w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition text-gray-300 hover:text-white" title="Appel vidéo">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          </button>
+          <button @click="showInfo = !showInfo" class="w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition text-gray-300 hover:text-white" title="Infos">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </button>
         </div>
       </header>
 
@@ -248,33 +254,46 @@
       </div>
     </main>
 
+    <!-- Backdrop mobile pour le panneau info -->
+    <div v-if="showInfo" @click="showInfo = false" class="fixed inset-0 bg-black/50 z-40 md:hidden"></div>
+
     <!-- ── Panneau info droite ──────────────────────────────────── -->
-    <aside v-if="showInfo" class="w-72 bg-gray-900 border-l border-gray-800 flex flex-col overflow-y-auto">
+    <aside :class="['fixed md:static inset-y-0 right-0 w-80 md:w-72 bg-gray-900 border-l border-gray-800 flex flex-col overflow-y-auto transition-transform duration-300 z-50 md:z-auto', showInfo ? 'translate-x-0' : 'translate-x-full md:translate-x-0']">
       <div class="p-4 border-b border-gray-800 flex items-center justify-between">
         <h3 class="font-semibold text-white">Infos</h3>
-        <button @click="showInfo = false" class="text-gray-400 hover:text-white">✕</button>
+        <button @click="showInfo = false" class="md:hidden text-gray-400 hover:text-white text-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
       <div class="p-4 text-center border-b border-gray-800">
         <img :src="conversation.avatar" class="w-20 h-20 rounded-full mx-auto object-cover mb-3" />
         <h3 class="font-bold text-white text-lg">{{ conversation.name }}</h3>
         <p v-if="conversation.description" class="text-gray-400 text-sm mt-1">{{ conversation.description }}</p>
       </div>
-      <div class="p-4">
+      <div class="p-4 flex-1">
         <h4 class="text-sm font-semibold text-gray-400 mb-3 uppercase">Membres ({{ participants.length }})</h4>
-        <div v-for="p in participants" :key="p.id" class="flex items-center gap-3 mb-3">
-          <div class="relative">
-            <img :src="p.avatar_url" class="w-9 h-9 rounded-full object-cover" />
-            <span :class="['status-dot absolute bottom-0 right-0', p.status]"></span>
-          </div>
-          <div>
-            <p class="text-sm font-medium text-white">{{ p.name }}</p>
-            <p class="text-xs text-gray-500">{{ p.last_seen }}</p>
+        <div class="space-y-3 max-h-[calc(100vh-400px)] md:max-h-none overflow-y-auto">
+          <div v-for="p in participants" :key="p.id" class="flex items-center gap-3">
+            <div class="relative flex-shrink-0">
+              <img :src="p.avatar_url" class="w-9 h-9 rounded-full object-cover" />
+              <span :class="['status-dot absolute bottom-0 right-0', p.status]"></span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-white truncate">{{ p.name }}</p>
+              <p class="text-xs text-gray-500 truncate">{{ p.last_seen }}</p>
+            </div>
           </div>
         </div>
       </div>
       <div class="p-4 border-t border-gray-800 space-y-2">
-        <button @click="archive" class="w-full text-left text-gray-400 hover:text-white text-sm py-2 px-3 rounded-lg hover:bg-gray-800 transition">📁 Archiver</button>
-        <button @click="mute" class="w-full text-left text-gray-400 hover:text-white text-sm py-2 px-3 rounded-lg hover:bg-gray-800 transition">🔇 Couper les notifications</button>
+        <button @click="archive; showInfo = false" class="w-full flex items-center gap-3 text-gray-400 hover:text-white text-sm py-2 px-3 rounded-lg hover:bg-gray-800 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 5 7 13"/><line x1="7" y1="5" x2="17" y2="5"/></svg>
+          Archiver
+        </button>
+        <button @click="mute; showInfo = false" class="w-full flex items-center gap-3 text-gray-400 hover:text-white text-sm py-2 px-3 rounded-lg hover:bg-gray-800 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 3.54a9 9 0 0 1 0 12.73M19.07 4.93a15 15 0 0 1 0 14.14M9.9 20.1h.01"/><line x1="9.9" y1="20" x2="9.9" y2="19.9"/></svg>
+          Couper les notifications
+        </button>
       </div>
     </aside>
 
@@ -283,7 +302,7 @@
     <CallModal v-if="store.incomingCall" :call="store.incomingCall" :auth-user="authUser" />
     <ActiveCallModal v-if="store.activeCall" :call="store.activeCall" :auth-user="authUser"
       :local-stream="localStream" :remote-stream="remoteStream"
-      @end="endCall" @toggle-mute="toggleMute" @toggle-video="toggleVideo"
+      @end="handleEndCall" @toggle-mute="toggleMute" @toggle-video="toggleVideo"
       :is-muted="isMuted" :is-video-off="isVideoOff" />
   </div>
 </template>
@@ -624,6 +643,11 @@ function onScroll() { /* détecter scroll vers le haut pour load more */ }
 async function startCall(type) {
   await initCall(props.conversation.id, type);
   store.setActiveCall({ type, conversation: props.conversation });
+}
+
+async function handleEndCall() {
+  await endCall();
+  store.clearActiveCall();
 }
 
 async function archive() { await axios.post(`/conversations/${props.conversation.id}/archive`); router.visit('/conversations'); }

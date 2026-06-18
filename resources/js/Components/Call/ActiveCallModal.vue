@@ -24,7 +24,7 @@
         {{ callTimer }}
       </div>
     </div>
-
+ 
     <!-- Controls -->
     <div class="flex items-center justify-center gap-6 mt-8">
       <button @click="$emit('toggle-mute')"
@@ -38,7 +38,8 @@
       </button>
 
       <button @click="$emit('end')"
-        class="w-16 h-16 bg-red-500 hover:bg-red-400 rounded-full flex items-center justify-center text-3xl transition shadow-xl">
+        class="w-16 h-16 bg-red-500 hover:bg-red-400 rounded-full flex items-center justify-center text-3xl transition shadow-xl hover:scale-110"
+        title="Quitter l'appel (Échap)">
         📵
       </button>
 
@@ -54,11 +55,12 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 
 const props = defineProps(['call', 'authUser', 'localStream', 'remoteStream', 'isMuted', 'isVideoOff']);
-defineEmits(['end', 'toggle-mute', 'toggle-video']);
+const emit = defineEmits(['end', 'toggle-mute', 'toggle-video']);
 
 const speakerOn  = ref(true);
 const elapsed    = ref(0);
 let timerRef     = null;
+let keyDownHandler = null;
 
 const statusText = computed(() => {
   if (elapsed.value === 0) return 'Connexion…';
@@ -73,9 +75,24 @@ const callTimer = computed(() => {
 
 onMounted(() => {
   timerRef = setInterval(() => elapsed.value++, 1000);
+  
+  // Raccourci clavier: Échap pour quitter l'appel
+  keyDownHandler = (e) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      emit('end');
+    }
+  };
+  
+  window.addEventListener('keydown', keyDownHandler);
 });
 
-onUnmounted(() => clearInterval(timerRef));
+onUnmounted(() => {
+  clearInterval(timerRef);
+  if (keyDownHandler) {
+    window.removeEventListener('keydown', keyDownHandler);
+  }
+});
 
 function toggleSpeaker() {
   speakerOn.value = !speakerOn.value;
