@@ -24,6 +24,13 @@ COPY . .
 # Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
+# Copier un .env minimal pour permettre aux commandes artisan de tourner pendant le build
+RUN cp .env.example .env || touch .env
+RUN php artisan key:generate --force || true
+
+# Générer le fichier Ziggy (routes JS) avant le build Vite
+RUN php artisan ziggy:generate || true
+
 # Installer et builder les assets JS (si applicable)
 RUN if [ -f package.json ]; then npm install && npm run build; fi
 
