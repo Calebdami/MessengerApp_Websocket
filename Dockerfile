@@ -43,9 +43,10 @@ RUN rm -f /etc/nginx/sites-enabled/default
 # Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Copier un .env minimal pour permettre aux commandes artisan de tourner pendant le build
-RUN test -f .env.example && cp .env.example .env || echo "APP_KEY=" > .env
-RUN php artisan key:generate --force
+# Laravel a besoin d'une APP_KEY valide pour exécuter les commandes artisan
+# pendant le build (ex: ziggy:generate). Cette clé est temporaire et sera
+# remplacée par la vraie APP_KEY définie dans les Environment Variables de Render au runtime.
+RUN touch .env && php artisan key:generate --force
 
 # Générer le fichier Ziggy (routes JS) avant le build Vite
 RUN php artisan ziggy:generate
