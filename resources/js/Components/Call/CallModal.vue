@@ -17,12 +17,12 @@
       <!-- Boutons -->
       <div class="p-6 flex justify-center gap-8">
         <button @click="decline"
-          class="w-16 h-16 bg-red-500 hover:bg-red-400 rounded-full flex items-center justify-center text-2xl transition shadow-lg">
-          📵
+          class="w-16 h-16 bg-red-500 hover:bg-red-400 rounded-full flex items-center justify-center transition shadow-lg" title="Décliner">
+          <SvgIcon name="phone-hangup" className="w-8 h-8 text-white" />
         </button>
         <button @click="answer"
-          class="w-16 h-16 bg-green-500 hover:bg-green-400 rounded-full flex items-center justify-center text-2xl transition shadow-lg animate-bounce">
-          {{ call.call_type === 'video' ? '📹' : '📞' }}
+          class="w-16 h-16 bg-green-500 hover:bg-green-400 rounded-full flex items-center justify-center transition shadow-lg animate-bounce" :title="call.call_type === 'video' ? 'Répondre en vidéo' : 'Répondre'">
+          <SvgIcon :name="call.call_type === 'video' ? 'video-call' : 'phone-incoming'" className="w-8 h-8 text-white" />
         </button>
       </div>
     </div>
@@ -31,6 +31,7 @@
 
 <script setup>
 import axios from 'axios';
+import SvgIcon from '@/Components/UI/SvgIcon.vue';
 import { useMessengerStore } from '@/stores/messenger.js';
 import { useWebRTC } from '@/composables/useWebRTC.js';
 

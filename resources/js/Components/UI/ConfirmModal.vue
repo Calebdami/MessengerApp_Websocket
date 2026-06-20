@@ -5,8 +5,8 @@
 
         <!-- Icône -->
         <div class="text-center mb-5">
-          <div :class="['w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-4', iconClass]">
-            {{ options.icon ?? '🚪' }}
+          <div :class="['w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4', iconClass]">
+            <SvgIcon :name="options.icon || 'logout'" className="w-8 h-8" />
           </div>
           <h3 class="font-bold text-lg" :style="{ color: 'var(--text-primary)' }">
             {{ options.title ?? 'Confirmer' }}
@@ -35,6 +35,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import SvgIcon from '@/Components/UI/SvgIcon.vue';
 
 const visible  = ref(false);
 const options  = ref({});

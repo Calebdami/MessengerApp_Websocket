@@ -32,9 +32,9 @@
                 class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 pr-12 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
               />
               <button type="button" @click="showPassword = !showPassword"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
-                {{ showPassword ? '🙈' : '👁️' }}
-              </button>
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white flex items-center justify-center" :title="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+              <SvgIcon :name="showPassword ? 'eye-off' : 'eye'" className="w-5 h-5" />
+            </button>
             </div>
             <p v-if="errors.password" class="text-red-400 text-xs mt-1">{{ errors.password }}</p>
           </div>
@@ -66,6 +66,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import SvgIcon from '@/Components/UI/SvgIcon.vue';
 import { router, usePage } from '@inertiajs/vue3';
 
 const page = usePage();

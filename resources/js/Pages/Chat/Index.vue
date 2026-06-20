@@ -11,12 +11,12 @@
         <div class="flex items-center gap-2">
           <button @click="showNewChat = true"
             class="w-9 h-9 bg-indigo-600 hover:bg-indigo-500 rounded-full flex items-center justify-center text-white transition text-lg" title="Nouvelle conversation">
-            ✏️
+            <SvgIcon name="pen" className="w-5 h-5" />
           </button>
           <div class="relative">
             <button @click="showNotifications = !showNotifications"
-              class="w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition">
-              🔔
+              class="w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition" title="Notifications">
+              <SvgIcon name="bell" className="w-5 h-5 text-gray-400" />
             </button>
             <span v-if="store.totalUnread > 0"
               class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
@@ -29,7 +29,7 @@
       <!-- Search -->
       <div class="p-3 border-b border-gray-800">
         <div class="relative">
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          <SvgIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input v-model="search" type="text" placeholder="Rechercher…"
             class="w-full bg-gray-800 rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
         </div>
@@ -45,7 +45,9 @@
           <p class="text-sm font-semibold text-white truncate">{{ authUser.name }}</p>
           <p class="text-xs text-gray-400">@{{ authUser.username }}</p>
         </div>
-        <a href="/settings" class="text-gray-400 hover:text-white transition">⚙️</a>
+        <a href="/settings" class="text-gray-400 hover:text-white transition" title="Paramètres">
+          <SvgIcon name="cog" className="w-5 h-5" />
+        </a>
       </div>
 
       <!-- Conversations list -->
@@ -66,7 +68,9 @@
           <div class="relative flex-shrink-0">
             <img :src="conv.avatar" class="w-12 h-12 rounded-full object-cover" />
             <span v-if="conv.type === 'direct'" :class="['status-dot absolute bottom-0 right-0', getStatus(conv)]"></span>
-            <span v-if="conv.is_pinned" class="absolute -top-1 -right-1 text-xs">📌</span>
+            <span v-if="conv.is_pinned" class="absolute -top-1 -right-1 bg-gray-900/80 p-0.5 rounded-full text-indigo-400">
+              <SvgIcon name="pin" className="w-3 h-3" />
+            </span>
           </div>
 
           <!-- Content -->
@@ -79,7 +83,7 @@
             </div>
             <div class="flex items-center justify-between">
               <p class="text-xs text-gray-400 truncate flex items-center gap-1">
-                <span v-if="conv.is_muted">🔇</span>
+                <SvgIcon v-if="conv.is_muted" name="mute" className="w-3.5 h-3.5 text-gray-500 inline mr-1" />
                 <span v-if="conv.last_message?.sender_id === authUser.id" class="text-gray-500">Vous: </span>
                 {{ conv.last_message?.content || 'Démarrer la conversation' }}
               </p>
@@ -96,7 +100,7 @@
       <div class="p-3 border-t border-gray-800">
         <button @click="logout"
           class="w-full text-gray-400 hover:text-red-400 text-sm py-2 transition flex items-center justify-center gap-2">
-          🚪 Se déconnecter
+          <SvgIcon name="logout" className="w-4 h-4" /> Se déconnecter
         </button>
       </div>
     </aside>
@@ -105,7 +109,7 @@
     <main class="flex-1 flex flex-col items-center justify-center bg-gray-950">
       <!-- Toggle button mobile -->
       <button @click="sidebarOpen = !sidebarOpen" class="absolute top-4 left-4 md:hidden w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center text-white transition" title="Menu">
-        ☰
+        <SvgIcon name="menu" className="w-5 h-5" />
       </button>
       <div class="text-center text-gray-500">
         <div class="text-8xl mb-4">💬</div>
@@ -126,7 +130,9 @@
       class="fixed right-4 top-16 w-80 bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl z-50 overflow-hidden">
       <div class="p-4 border-b border-gray-800 flex items-center justify-between">
         <h3 class="font-semibold text-white">Notifications</h3>
-        <button @click="showNotifications = false" class="text-gray-400 hover:text-white">✕</button>
+        <button @click="showNotifications = false" class="text-gray-400 hover:text-white">
+          <SvgIcon name="close" className="w-4 h-4" />
+        </button>
       </div>
       <div class="max-h-96 overflow-y-auto">
         <div v-if="store.notifications.length === 0" class="p-6 text-center text-gray-500 text-sm">
@@ -156,6 +162,7 @@ import { router } from '@inertiajs/vue3';
 import { useMessengerStore } from '@/stores/messenger.js';
 import { useRealtime } from '@/composables/useRealtime.js';
 import NewChatModal from '@/Components/Chat/NewChatModal.vue';
+import SvgIcon from '@/Components/UI/SvgIcon.vue';
 
 const toast   = ref(null);
 const confirm = ref(null);
@@ -207,7 +214,7 @@ function formatTime(iso) {
 
 async function logout() {
   const ok = await confirm.value.open({
-    icon:         '🚪',
+    icon:         'logout',
     title:        'Se déconnecter',
     message:      'Êtes-vous sûr de vouloir vous déconnecter ?',
     variant:      'danger',

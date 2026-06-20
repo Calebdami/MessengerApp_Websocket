@@ -4,7 +4,9 @@
     <!-- Sidebar paramètres -->
     <aside class="w-64 bg-gray-900 border-r border-gray-800 p-4 flex flex-col">
       <div class="flex items-center gap-3 mb-6">
-        <a href="/conversations" class="text-gray-400 hover:text-white transition">←</a>
+        <a href="/conversations" class="text-gray-400 hover:text-white transition" title="Retour">
+          <SvgIcon name="arrow-left" className="w-5 h-5" />
+        </a>
         <h1 class="text-white font-bold text-lg">Paramètres</h1>
       </div>
 
@@ -12,8 +14,8 @@
       <div class="text-center mb-6 p-4 bg-gray-800 rounded-2xl">
         <div class="relative inline-block">
           <img :src="previewAvatar || authUser.avatar_url" class="w-20 h-20 rounded-full object-cover mx-auto" />
-          <label class="absolute bottom-0 right-0 w-7 h-7 bg-indigo-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-indigo-500 transition">
-            ✏️<input type="file" accept="image/*" class="hidden" @change="previewAvatarChange" />
+          <label class="absolute bottom-0 right-0 w-7 h-7 bg-indigo-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-indigo-500 transition" title="Modifier l'avatar">
+            <SvgIcon name="pen" className="w-4 h-4 text-white" /><input type="file" accept="image/*" class="hidden" @change="previewAvatarChange" />
           </label>
         </div>
         <p class="text-white font-semibold mt-3">{{ authUser.name }}</p>
@@ -26,7 +28,7 @@
           @click="activeSection = item.key"
           :class="['w-full text-left px-3 py-2.5 rounded-xl text-sm transition flex items-center gap-3',
             activeSection === item.key ? 'bg-indigo-600/20 text-indigo-400' : 'text-gray-400 hover:bg-gray-800 hover:text-white']">
-          {{ item.icon }} {{ item.label }}
+          <SvgIcon :name="item.icon" className="w-4 h-4" /> {{ item.label }}
         </button>
       </nav>
     </aside>
@@ -36,7 +38,7 @@
 
       <!-- Succès -->
       <div v-if="success" class="mb-6 bg-green-500/20 border border-green-500/30 rounded-xl px-4 py-3 text-green-400 text-sm flex items-center gap-2">
-        ✅ {{ success }}
+        <SvgIcon name="check-circle" className="w-5 h-5 text-green-400" /> {{ success }}
       </div>
 
       <!-- ── Profil ── -->
@@ -67,8 +69,9 @@
             <label class="block text-sm text-gray-400 mb-2">Téléphone</label>
             <input v-model="profileForm.phone" type="tel" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition" placeholder="+229 XX XX XX XX" />
           </div>
-          <button type="submit" :disabled="saving" class="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition">
-            {{ saving ? 'Enregistrement…' : '💾 Enregistrer le profil' }}
+          <button type="submit" :disabled="saving" class="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition flex items-center gap-2">
+            <SvgIcon v-if="!saving" name="save" className="w-4 h-4" />
+            {{ saving ? 'Enregistrement…' : 'Enregistrer le profil' }}
           </button>
         </form>
       </section>
@@ -91,7 +94,10 @@
             <input v-model="passwordForm.password_confirmation" type="password" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition" required />
             <p v-if="errors.password" class="text-red-400 text-xs mt-1">{{ errors.password }}</p>
           </div>
-          <button type="submit" :disabled="saving" class="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition">🔒 Changer le mot de passe</button>
+          <button type="submit" :disabled="saving" class="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition flex items-center gap-2">
+            <SvgIcon name="lock" className="w-4 h-4" />
+            {{ saving ? 'Changement…' : 'Changer le mot de passe' }}
+          </button>
         </form>
       </section>
 
@@ -106,8 +112,9 @@
             <div class="grid grid-cols-3 gap-3">
               <button v-for="t in themes" :key="t.value" type="button"
                 @click="prefForm.theme = t.value"
-                :class="['p-3 rounded-xl border text-sm text-center transition', prefForm.theme === t.value ? 'border-indigo-500 bg-indigo-500/20 text-indigo-400' : 'border-gray-700 text-gray-400 hover:border-gray-600']">
-                {{ t.icon }}<br />{{ t.label }}
+                :class="['p-3 rounded-xl border text-sm text-center transition flex flex-col items-center justify-center gap-2', prefForm.theme === t.value ? 'border-indigo-500 bg-indigo-500/20 text-indigo-400' : 'border-gray-700 text-gray-400 hover:border-gray-600']">
+                <SvgIcon :name="t.icon" className="w-5 h-5 mx-auto" />
+                {{ t.label }}
               </button>
             </div>
           </div>
@@ -148,7 +155,10 @@
             </div>
           </div>
 
-          <button type="submit" :disabled="saving" class="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition">💾 Enregistrer les préférences</button>
+          <button type="submit" :disabled="saving" class="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition flex items-center gap-2">
+            <SvgIcon name="save" className="w-4 h-4" />
+            {{ saving ? 'Enregistrement…' : 'Enregistrer les préférences' }}
+          </button>
         </form>
       </section>
 
@@ -158,6 +168,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import SvgIcon from '@/Components/UI/SvgIcon.vue';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 
@@ -171,15 +182,15 @@ const previewAvatar  = ref(null);
 const avatarFile     = ref(null);
 
 const navItems = [
-  { key: 'profile',     icon: '👤', label: 'Profil' },
-  { key: 'security',    icon: '🔒', label: 'Sécurité' },
-  { key: 'preferences', icon: '⚙️', label: 'Préférences' },
+  { key: 'profile',     icon: 'user', label: 'Profil' },
+  { key: 'security',    icon: 'lock', label: 'Sécurité' },
+  { key: 'preferences', icon: 'cog', label: 'Préférences' },
 ];
 
 const themes = [
-  { value: 'dark',   icon: '🌙', label: 'Sombre' },
-  { value: 'light',  icon: '☀️', label: 'Clair' },
-  { value: 'system', icon: '💻', label: 'Système' },
+  { value: 'dark',   icon: 'moon', label: 'Sombre' },
+  { value: 'light',  icon: 'sun', label: 'Clair' },
+  { value: 'system', icon: 'computer', label: 'Système' },
 ];
 
 const profileForm = ref({

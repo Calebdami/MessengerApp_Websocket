@@ -28,24 +28,24 @@
     <!-- Controls -->
     <div class="flex items-center justify-center gap-6 mt-8">
       <button @click="$emit('toggle-mute')"
-        :class="['w-14 h-14 rounded-full flex items-center justify-center text-2xl transition shadow-lg', isMuted ? 'bg-red-500 hover:bg-red-400' : 'bg-gray-700 hover:bg-gray-600']">
-        {{ isMuted ? '🔇' : '🎤' }}
+        :class="['w-14 h-14 rounded-full flex items-center justify-center transition shadow-lg', isMuted ? 'bg-red-500 hover:bg-red-400' : 'bg-gray-700 hover:bg-gray-600']" :title="isMuted ? 'Activer le micro' : 'Couper le micro'">
+        <SvgIcon :name="isMuted ? 'mic-off' : 'mic'" className="w-6 h-6 text-white" />
       </button>
 
       <button v-if="call.call_type === 'video'" @click="$emit('toggle-video')"
-        :class="['w-14 h-14 rounded-full flex items-center justify-center text-2xl transition shadow-lg', isVideoOff ? 'bg-red-500 hover:bg-red-400' : 'bg-gray-700 hover:bg-gray-600']">
-        {{ isVideoOff ? '📵' : '📹' }}
+        :class="['w-14 h-14 rounded-full flex items-center justify-center transition shadow-lg', isVideoOff ? 'bg-red-500 hover:bg-red-400' : 'bg-gray-700 hover:bg-gray-600']" :title="isVideoOff ? 'Activer la caméra' : 'Couper la caméra'">
+        <SvgIcon :name="isVideoOff ? 'video-call-off' : 'video-call'" className="w-6 h-6 text-white" />
       </button>
 
       <button @click="$emit('end')"
-        class="w-16 h-16 bg-red-500 hover:bg-red-400 rounded-full flex items-center justify-center text-3xl transition shadow-xl hover:scale-110"
+        class="w-16 h-16 bg-red-500 hover:bg-red-400 rounded-full flex items-center justify-center transition shadow-xl hover:scale-110"
         title="Quitter l'appel (Échap)">
-        📵
+        <SvgIcon name="phone-hangup" className="w-8 h-8 text-white" />
       </button>
 
       <button @click="toggleSpeaker"
-        class="w-14 h-14 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-2xl transition shadow-lg">
-        {{ speakerOn ? '🔊' : '🔈' }}
+        class="w-14 h-14 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center transition shadow-lg" :title="speakerOn ? 'Désactiver le haut-parleur' : 'Activer le haut-parleur'">
+        <SvgIcon :name="speakerOn ? 'speaker' : 'speaker-mute'" className="w-6 h-6 text-white" />
       </button>
     </div>
   </div>
@@ -53,6 +53,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import SvgIcon from '@/Components/UI/SvgIcon.vue';
 
 const props = defineProps(['call', 'authUser', 'localStream', 'remoteStream', 'isMuted', 'isVideoOff']);
 const emit = defineEmits(['end', 'toggle-mute', 'toggle-video']);
