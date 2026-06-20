@@ -34,5 +34,5 @@ createInertiaApp({
             .use(ConfirmationService)
             .mount(el);
     },
-    progress: { color: '#6366f1' },
+    progress: { color: '#c4b5fd', includeCSS: true, showSpinner: true },
 });

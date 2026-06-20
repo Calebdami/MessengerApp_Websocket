@@ -8,7 +8,9 @@
       <div class="p-4 border-b border-gray-800 flex items-center justify-between">
         <a href="/conversations" class="text-white font-bold text-lg flex items-center gap-2">💬 Messenger</a>
         <button @click="showNewChat = true"
-          class="w-9 h-9 bg-indigo-600 hover:bg-indigo-500 rounded-full flex items-center justify-center text-white text-lg transition">✏️</button>
+          class="w-9 h-9 bg-indigo-600 hover:bg-indigo-500 rounded-full flex items-center justify-center text-white text-lg transition" title="Nouvelle conversation">
+          <SvgIcon name="pen" className="w-5 h-5" />
+        </button>
       </div>
       <div class="p-3 border-b border-gray-800">
         <input v-model="sidebarSearch" placeholder="Rechercher…"
@@ -41,7 +43,7 @@
       <header class="flex items-center gap-3 px-4 py-3 bg-gray-900 border-b border-gray-800 flex-shrink-0">
         <!-- Toggle button mobile -->
         <button @click="sidebarOpen = !sidebarOpen" class="md:hidden w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center text-white transition flex-shrink-0" title="Menu">
-          ☰
+          <SvgIcon name="menu" className="w-5 h-5" />
         </button>
         <img :src="conversation.avatar" class="w-10 h-10 rounded-full object-cover" />
         <div class="flex-1">
@@ -49,7 +51,10 @@
           <p class="text-xs text-gray-400">
             <span v-if="typingText">{{ typingText }}</span>
             <span v-else-if="conversation.type === 'direct'">
-              {{ otherParticipant?.status === 'online' ? '🟢 En ligne' : otherParticipant?.last_seen }}
+              <span v-if="otherParticipant?.status === 'online'" class="flex items-center gap-1.5">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span> En ligne
+              </span>
+              <span v-else>{{ otherParticipant?.last_seen }}</span>
             </span>
             <span v-else>{{ participants.length }} membres</span>
           </p>
@@ -72,8 +77,9 @@
         <!-- Charger plus -->
         <div v-if="hasMore" class="flex justify-center pb-2">
           <button @click="loadMore" :disabled="loadingMore"
-            class="text-indigo-400 hover:text-indigo-300 text-sm disabled:opacity-50">
-            {{ loadingMore ? 'Chargement…' : '⬆️ Messages précédents' }}
+            class="text-indigo-400 hover:text-indigo-300 text-sm disabled:opacity-50 flex items-center gap-1 mx-auto">
+            <SvgIcon name="arrow-up" className="w-4 h-4" />
+            {{ loadingMore ? 'Chargement…' : 'Messages précédents' }}
           </button>
         </div>
 
@@ -121,7 +127,9 @@
           <p class="text-xs text-indigo-400 font-medium">{{ replyTo.sender?.name }}</p>
           <p class="text-xs text-gray-400 truncate">{{ replyTo.content || typeLabel(replyTo.type) }}</p>
         </div>
-        <button @click="replyTo = null" class="text-gray-400 hover:text-white">✕</button>
+        <button @click="replyTo = null" class="text-gray-400 hover:text-white" title="Fermer">
+          <SvgIcon name="close" className="w-4 h-4" />
+        </button>
       </div>
 
       <!-- Input area -->
@@ -132,7 +140,9 @@
           <!-- Emoji -->
           <div class="relative">
             <button @click="showEmoji = !showEmoji"
-              class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white text-xl transition">😊</button>
+              class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white transition" title="Emoji">
+              <SvgIcon name="emoji" className="w-6 h-6" />
+            </button>
             <div v-if="showEmoji" class="absolute bottom-12 left-0 z-50">
               <emoji-picker @emoji-click="onEmojiClick"></emoji-picker>
             </div>
@@ -141,7 +151,9 @@
           <!-- Stickers -->
           <div class="relative">
             <button @click="showStickers = !showStickers"
-              class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white text-xl transition">🎭</button>
+              class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white transition" title="Stickers">
+              <SvgIcon name="sticker" className="w-6 h-6" />
+            </button>
             <div v-if="showStickers" class="absolute bottom-12 left-0 z-50 bg-gray-800 rounded-2xl p-3 grid grid-cols-5 gap-2 w-64 shadow-xl">
               <button v-for="s in stickers" :key="s" @click="sendSticker(s)"
                 class="text-2xl hover:scale-125 transition">{{ s }}</button>
@@ -164,24 +176,24 @@
 
           <!-- Attachments -->
           <div class="flex items-center gap-1">
-            <label class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white text-xl cursor-pointer transition" title="Image">
-              🖼️<input type="file" accept="image/*" class="hidden" @change="(e) => sendFile(e, 'image')" />
+            <label class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white cursor-pointer transition" title="Image">
+              <SvgIcon name="image" className="w-5 h-5" /><input type="file" accept="image/*" class="hidden" @change="(e) => sendFile(e, 'image')" />
             </label>
-            <label class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white text-xl cursor-pointer transition" title="Vidéo">
-              🎥<input type="file" accept="video/*" class="hidden" @change="(e) => sendFile(e, 'video')" />
+            <label class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white cursor-pointer transition" title="Vidéo">
+              <SvgIcon name="video" className="w-5 h-5" /><input type="file" accept="video/*" class="hidden" @change="(e) => sendFile(e, 'video')" />
             </label>
-            <label class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white text-xl cursor-pointer transition" title="Audio">
-              🎵<input type="file" accept="audio/*" class="hidden" @change="(e) => sendFile(e, 'audio')" />
+            <label class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white cursor-pointer transition" title="Audio">
+              <SvgIcon name="audio" className="w-5 h-5" /><input type="file" accept="audio/*" class="hidden" @change="(e) => sendFile(e, 'audio')" />
             </label>
-            <label class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white text-xl cursor-pointer transition" title="Fichier">
-              📎<input type="file" class="hidden" @change="(e) => sendFile(e, 'file')" />
+            <label class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white cursor-pointer transition" title="Fichier">
+              <SvgIcon name="file" className="w-5 h-5" /><input type="file" class="hidden" @change="(e) => sendFile(e, 'file')" />
             </label>
           </div>
 
           <!-- Send -->
           <button @click="sendMessage" :disabled="!newMessage.trim() && !sending"
-            class="w-10 h-10 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 rounded-full flex items-center justify-center text-white text-lg transition flex-shrink-0">
-            ➤
+            class="w-10 h-10 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 rounded-full flex items-center justify-center text-white transition flex-shrink-0" title="Envoyer">
+            <SvgIcon name="send" className="w-5 h-5" />
           </button>
         </div>
 
@@ -204,7 +216,9 @@
           <!-- Stickers -->
           <div class="relative flex-shrink-0">
             <button @click="showStickers = !showStickers" ref="stickersBtn"
-              class="w-10 h-10 flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white text-xl rounded-lg transition">🎭</button>
+              class="w-10 h-10 flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition" title="Stickers">
+              <SvgIcon name="sticker" className="w-5 h-5" />
+            </button>
             <div v-if="showStickers" class="fixed z-50 bg-gray-800 rounded-2xl p-3 grid grid-cols-5 gap-2 shadow-xl" :style="stickersMenuStyle">
               <button v-for="s in stickers" :key="s" @click="sendSticker(s); showStickers = false"
                 class="text-2xl hover:scale-125 transition">{{ s }}</button>
@@ -214,13 +228,15 @@
           <!-- More options -->
           <div class="relative flex-shrink-0">
             <button @click="showMoreOptions = !showMoreOptions" ref="moreOptionsBtn"
-              class="w-10 h-10 flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white text-lg rounded-lg transition">⋮</button>
+              class="w-10 h-10 flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition">
+              <SvgIcon name="more-v" className="w-5 h-5" />
+            </button>
             <div v-if="showMoreOptions" class="fixed z-50 bg-gray-900 rounded-2xl border border-gray-700 shadow-xl overflow-hidden min-w-48" :style="moreOptionsMenuStyle">
               <!-- Emoji -->
               <div class="p-2">
                 <button @click="showEmoji = !showEmoji"
                   class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition text-left whitespace-nowrap">
-                  😊 Emoji
+                  <SvgIcon name="emoji" className="w-5 h-5 text-gray-400" /> Emoji
                 </button>
                 <div v-if="showEmoji" class="mt-2">
                   <emoji-picker @emoji-click="onEmojiClick"></emoji-picker>
@@ -230,16 +246,16 @@
               <!-- Attachments -->
               <div class="p-2 space-y-1">
                 <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer whitespace-nowrap">
-                  🖼️ Image <input type="file" accept="image/*" class="hidden" @change="(e) => { sendFile(e, 'image'); showMoreOptions = false; }" />
+                  <SvgIcon name="image" className="w-5 h-5 text-gray-400" /> Image <input type="file" accept="image/*" class="hidden" @change="(e) => { sendFile(e, 'image'); showMoreOptions = false; }" />
                 </label>
                 <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer whitespace-nowrap">
-                  🎥 Vidéo <input type="file" accept="video/*" class="hidden" @change="(e) => { sendFile(e, 'video'); showMoreOptions = false; }" />
+                  <SvgIcon name="video" className="w-5 h-5 text-gray-400" /> Vidéo <input type="file" accept="video/*" class="hidden" @change="(e) => { sendFile(e, 'video'); showMoreOptions = false; }" />
                 </label>
                 <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer whitespace-nowrap">
-                  🎵 Audio <input type="file" accept="audio/*" class="hidden" @change="(e) => { sendFile(e, 'audio'); showMoreOptions = false; }" />
+                  <SvgIcon name="audio" className="w-5 h-5 text-gray-400" /> Audio <input type="file" accept="audio/*" class="hidden" @change="(e) => { sendFile(e, 'audio'); showMoreOptions = false; }" />
                 </label>
                 <label class="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition cursor-pointer whitespace-nowrap">
-                  📎 Fichier <input type="file" class="hidden" @change="(e) => { sendFile(e, 'file'); showMoreOptions = false; }" />
+                  <SvgIcon name="file" className="w-5 h-5 text-gray-400" /> Fichier <input type="file" class="hidden" @change="(e) => { sendFile(e, 'file'); showMoreOptions = false; }" />
                 </label>
               </div>
             </div>
@@ -247,22 +263,22 @@
 
           <!-- Send -->
           <button @click="sendMessage" :disabled="!newMessage.trim() && !sending"
-            class="w-10 h-10 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 rounded-lg flex items-center justify-center text-white text-lg transition flex-shrink-0">
-            ➤
+            class="w-10 h-10 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 rounded-lg flex items-center justify-center text-white transition flex-shrink-0" title="Envoyer">
+            <SvgIcon name="send" className="w-5 h-5" />
           </button>
         </div>
       </div>
     </main>
 
-    <!-- Backdrop mobile pour le panneau info -->
-    <div v-if="showInfo" @click="showInfo = false" class="fixed inset-0 bg-black/50 z-40 md:hidden"></div>
-
     <!-- ── Panneau info droite ──────────────────────────────────── -->
-    <aside :class="['fixed md:static inset-y-0 right-0 w-80 md:w-72 bg-gray-900 border-l border-gray-800 flex flex-col overflow-y-auto transition-transform duration-300 z-50 md:z-auto', showInfo ? 'translate-x-0' : 'translate-x-full md:translate-x-0']">
+    <!-- Backdrop (mobile ET desktop quand ouvert) -->
+    <div v-if="showInfo" @click="showInfo = false" class="fixed inset-0 bg-black/50 z-40 lg:hidden"></div>
+
+    <aside :class="['fixed inset-y-0 right-0 w-80 bg-gray-900 border-l border-gray-800 flex flex-col overflow-y-auto transition-transform duration-300 z-50', showInfo ? 'translate-x-0' : 'translate-x-full']">
       <div class="p-4 border-b border-gray-800 flex items-center justify-between">
         <h3 class="font-semibold text-white">Infos</h3>
-        <button @click="showInfo = false" class="md:hidden text-gray-400 hover:text-white text-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <button @click="showInfo = false" class="text-gray-400 hover:text-white flex items-center justify-center" title="Fermer">
+          <SvgIcon name="close" className="w-6 h-6" />
         </button>
       </div>
       <div class="p-4 text-center border-b border-gray-800">
@@ -322,6 +338,7 @@ import NewChatModal from '@/Components/Chat/NewChatModal.vue';
 import CallModal from '@/Components/Call/CallModal.vue';
 import ActiveCallModal from '@/Components/Call/ActiveCallModal.vue';
 import UploadingBubble from '@/Components/Chat/UploadingBubble.vue';
+import SvgIcon from '@/Components/UI/SvgIcon.vue';
 
 // Enregistrer emoji-picker en web component
 import 'emoji-picker-element';
@@ -591,14 +608,19 @@ async function react(msg, emoji) {
 }
 
 async function editMessage(msg, content) {
+    // Mise à jour optimiste immédiate
+    const m = store.messages.find(m => m.id === msg.id);
+    if (m) { m.content = content; m.is_edited = true; }
     try {
         await axios.put(`/messages/${msg.id}`, { content });
         toast.value?.add({
             type:    'success',
             message: 'Message modifié',
-            duration: 3000,
+            duration: 2500,
         });
     } catch (err) {
+        // Rollback
+        if (m) { m.content = msg.content; m.is_edited = msg.is_edited; }
         toast.value?.add({
             type:    'error',
             message: 'Impossible de modifier ce message',
@@ -608,9 +630,14 @@ async function editMessage(msg, content) {
 }
 
 async function deleteMessage(msg) {
+    // Mise à jour optimiste immédiate
+    const m = store.messages.find(m => m.id === msg.id);
+    if (m) m.is_deleted = true;
     try {
         await axios.delete(`/messages/${msg.id}`);
     } catch (err) {
+        // Rollback
+        if (m) m.is_deleted = false;
         toast.value?.add({
             type:    'error',
             message: 'Impossible de supprimer ce message',
@@ -665,6 +692,6 @@ function formatTime(iso) {
 }
 
 function typeLabel(type) {
-  return { image:'📷 Photo', video:'🎥 Vidéo', audio:'🎵 Audio', file:'📎 Fichier', sticker:'🎭 Sticker' }[type] || '';
+  return { image:'Photo', video:'Vidéo', audio:'Audio', file:'Fichier', sticker:'Sticker' }[type] || '';
 }
 </script>

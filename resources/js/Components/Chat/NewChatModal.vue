@@ -4,16 +4,18 @@
       <!-- Header -->
       <div class="p-4 border-b border-gray-800 flex items-center justify-between">
         <h2 class="text-white font-semibold text-lg">Nouvelle conversation</h2>
-        <button @click="$emit('close')" class="text-gray-400 hover:text-white transition">✕</button>
+        <button @click="$emit('close')" class="text-gray-400 hover:text-white transition" title="Fermer">
+          <SvgIcon name="close" className="w-4 h-4" />
+        </button>
       </div>
 
       <!-- Tabs -->
       <div class="flex border-b border-gray-800">
-        <button @click="tab = 'direct'" :class="['flex-1 py-3 text-sm font-medium transition', tab === 'direct' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-500']">
-          💬 Discussion directe
+        <button @click="tab = 'direct'" :class="['flex-1 py-3 text-sm font-medium transition flex items-center justify-center gap-2', tab === 'direct' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-500']">
+          <SvgIcon name="chat" className="w-4 h-4" /> Discussion directe
         </button>
-        <button @click="tab = 'group'" :class="['flex-1 py-3 text-sm font-medium transition', tab === 'group' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-500']">
-          👥 Groupe
+        <button @click="tab = 'group'" :class="['flex-1 py-3 text-sm font-medium transition flex items-center justify-center gap-2', tab === 'group' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-500']">
+          <SvgIcon name="group" className="w-4 h-4" /> Groupe
         </button>
       </div>
 
@@ -33,7 +35,9 @@
           <div v-for="u in selected" :key="u.id" class="flex items-center gap-1 bg-indigo-600/20 border border-indigo-500/30 rounded-full pl-1 pr-2 py-1">
             <img :src="u.avatar_url || avatarUrl(u.name)" class="w-5 h-5 rounded-full" />
             <span class="text-xs text-indigo-300">{{ u.name }}</span>
-            <button @click="toggleSelect(u)" class="text-indigo-300 hover:text-white ml-1 text-xs">✕</button>
+            <button @click="toggleSelect(u)" class="text-indigo-300 hover:text-white ml-1" title="Retirer">
+              <SvgIcon name="close" className="w-3 h-3" />
+            </button>
           </div>
         </div>
 
@@ -55,7 +59,9 @@
               <p class="text-white font-medium text-sm">{{ user.name }}</p>
               <p class="text-gray-400 text-xs">@{{ user.username }}</p>
             </div>
-            <span v-if="isSelected(user)" class="text-indigo-400">✓</span>
+            <span v-if="isSelected(user)" class="text-indigo-400">
+              <SvgIcon name="check" className="w-4 h-4" />
+            </span>
           </div>
         </div>
 
@@ -73,6 +79,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import SvgIcon from '@/Components/UI/SvgIcon.vue';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 

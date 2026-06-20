@@ -12,8 +12,8 @@
           <div class="flex-shrink-0">
             <img v-if="toast.avatar" :src="toast.avatar"
               class="w-10 h-10 rounded-full object-cover" />
-            <div v-else :class="['w-10 h-10 rounded-full flex items-center justify-center text-xl', iconBg(toast.type)]">
-              {{ icon(toast.type) }}
+            <div v-else :class="['w-10 h-10 rounded-full flex items-center justify-center', iconBg(toast.type)]">
+              <SvgIcon :name="iconName(toast.type)" className="w-5 h-5" />
             </div>
           </div>
 
@@ -37,8 +37,10 @@
 
           <!-- Bouton fermer -->
           <button @click.stop="remove(toast.id)"
-            class="flex-shrink-0 opacity-40 hover:opacity-100 transition text-sm ml-1"
-            :style="{ color: 'var(--text-primary)' }">✕</button>
+            class="flex-shrink-0 opacity-40 hover:opacity-100 transition ml-1 flex items-center justify-center"
+            :style="{ color: 'var(--text-primary)' }" title="Fermer">
+            <SvgIcon name="close" className="w-4 h-4" />
+          </button>
         </div>
       </TransitionGroup>
     </div>
@@ -47,6 +49,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import SvgIcon from '@/Components/UI/SvgIcon.vue';
 
 const toasts = ref([]);
 
@@ -70,8 +73,8 @@ function remove(id) {
   if (idx !== -1) toasts.value.splice(idx, 1);
 }
 
-function icon(type) {
-  return { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️', message: '💬' }[type] ?? 'ℹ️';
+function iconName(type) {
+  return { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info-circle', message: 'chat' }[type] ?? 'info-circle';
 }
 
 function iconBg(type) {
