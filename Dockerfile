@@ -44,11 +44,11 @@ RUN rm -f /etc/nginx/sites-enabled/default
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Copier un .env minimal pour permettre aux commandes artisan de tourner pendant le build
-RUN cp .env.example .env || touch .env
-RUN php artisan key:generate --force || true
+RUN test -f .env.example && cp .env.example .env || echo "APP_KEY=" > .env
+RUN php artisan key:generate --force
 
 # Générer le fichier Ziggy (routes JS) avant le build Vite
-RUN php artisan ziggy:generate || true
+RUN php artisan ziggy:generate
 
 # Installer et builder les assets JS (si applicable)
 RUN if [ -f package.json ]; then npm install && npm run build; fi
