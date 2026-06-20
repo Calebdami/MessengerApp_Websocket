@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev \
     libpq-dev \
+    nginx \
+    gettext-base \
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql zip \
     && rm -rf /var/lib/apt/lists/*
 
@@ -18,8 +20,25 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 
 WORKDIR /app
 
+# Variables nécessaires au moment du build Vite (injectées par Render via Build Args)
+ARG VITE_APP_NAME
+ARG VITE_REVERB_APP_KEY
+ARG VITE_REVERB_HOST
+ARG VITE_REVERB_PORT
+ARG VITE_REVERB_SCHEME
+ENV VITE_APP_NAME=$VITE_APP_NAME
+ENV VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY
+ENV VITE_REVERB_HOST=$VITE_REVERB_HOST
+ENV VITE_REVERB_PORT=$VITE_REVERB_PORT
+ENV VITE_REVERB_SCHEME=$VITE_REVERB_SCHEME
+
 # Copier le code
 COPY . .
+COPY start.sh ./start.sh
+COPY nginx.conf.template /etc/nginx/nginx.conf.template
+
+# Retirer la config nginx par défaut pour éviter les conflits
+RUN rm -f /etc/nginx/sites-enabled/default
 
 # Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction
@@ -38,6 +57,9 @@ RUN if [ -f package.json ]; then npm install && npm run build; fi
 RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
+# Script de démarrage (lance le serveur web ET Reverb)
+RUN chmod +x start.sh
+
 EXPOSE 8080
 
-CMD php artisan reverb:start --host=0.0.0.0 --port=$PORT
+CMD ["./start.sh"]
