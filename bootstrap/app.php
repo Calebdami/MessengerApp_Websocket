@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo('/login');
         $middleware->redirectUsersTo('/');
 
+        // Faire confiance au reverse proxy nginx (même conteneur) pour les
+        // en-têtes X-Forwarded-* (notamment X-Forwarded-Proto pour détecter HTTPS)
+        $middleware->trustProxies(at: '*');
+
         // Inertia
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,

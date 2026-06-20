@@ -3,6 +3,10 @@
 echo "=== Démarrage du conteneur ==="
 echo "PORT=$PORT"
 
+# Lancer les migrations (idempotent : ne réapplique pas ce qui est déjà fait)
+echo "--- Migrations de la base de données ---"
+php artisan migrate --force
+
 # Générer la config nginx avec le bon port (injecté par Render)
 echo "--- Génération de la config nginx ---"
 envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/sites-enabled/default
