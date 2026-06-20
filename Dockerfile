@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     nginx \
     gettext-base \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql zip \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql zip pcntl \
     && rm -rf /var/lib/apt/lists/*
 
 # Installer Composer
@@ -46,7 +46,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # Laravel a besoin d'une APP_KEY valide pour exécuter les commandes artisan
 # pendant le build (ex: ziggy:generate). Cette clé est temporaire et sera
 # remplacée par la vraie APP_KEY définie dans les Environment Variables de Render au runtime.
-RUN touch .env && php artisan key:generate --force
+RUN echo "APP_KEY=" > .env && php artisan key:generate --force
 
 # Générer le fichier Ziggy (routes JS) avant le build Vite
 RUN php artisan ziggy:generate
