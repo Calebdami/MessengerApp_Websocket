@@ -54,6 +54,11 @@ RUN php artisan ziggy:generate
 # Installer et builder les assets JS (si applicable)
 RUN if [ -f package.json ]; then npm install && npm run build; fi
 
+# Supprimer le .env temporaire utilisé pour le build : au runtime, Laravel doit lire
+# uniquement les vraies variables d'environnement définies sur Render (sinon ce fichier
+# avec une APP_KEY aléatoire et aucune autre variable écraserait toute la config).
+RUN rm -f .env
+
 # Permissions Laravel
 RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
